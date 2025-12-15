@@ -6,7 +6,7 @@
       "name": "Mastrena II",
       "subtitle": "Superauto espresso",
       "tag": "Coffee",
-      "config": "machines/mastrena2.json"
+      "config": "mastrena2.v2.json"
     }
   ]
 }
