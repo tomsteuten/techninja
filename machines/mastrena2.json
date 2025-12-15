@@ -1,0 +1,591 @@
+{
+  "machine": "Mastrena II",
+  "symptoms": [
+    {
+      "id": "low_water_flow",
+      "name": "Low water flow",
+      "description": "Weak or slow flow during rinse or shots",
+      "start": "flow_q1"
+    },
+    {
+      "id": "shot_quality",
+      "name": "Poor / inconsistent shot quality",
+      "description": "Shots running too fast/slow, uneven or bad quality",
+      "start": "shot_q1"
+    },
+    {
+      "id": "hopper_empty",
+      "name": "Hopper empty message",
+      "description": "\u2018Hopper empty\u2019 error even with beans present",
+      "start": "hopper_q1"
+    },
+    {
+      "id": "steam_temp",
+      "name": "Steaming to wrong temperature",
+      "description": "Milk too hot / too cold compared to setpoint",
+      "start": "steam_q1"
+    },
+    {
+      "id": "water_in_grounds",
+      "name": "Water in grounds drawer",
+      "description": "Excess water building up in grounds drawer",
+      "start": "drawer_q1"
+    }
+  ],
+  "steps": {
+    "flow_q1": {
+      "text": "Is the issue only on one brew chamber (left or right) when you run a rinse?",
+      "note": "Run a rinse and watch which stage has weak flow: stage 1 = left chamber, stage 2 = right chamber.",
+      "options": [
+        {
+          "label": "Yes, only one side is weak",
+          "next": "flow_q2",
+          "primary": true
+        },
+        {
+          "label": "No, both sides are weak / unclear",
+          "next": "flow_q4",
+          "primary": false
+        }
+      ]
+    },
+    "flow_q2": {
+      "text": "Which stage during rinse has weak flow?",
+      "note": "Stage 1 is left brew chamber, stage 2 is right brew chamber.",
+      "options": [
+        {
+          "label": "Stage 1 (left chamber)",
+          "next": "flow_left_block",
+          "primary": true
+        },
+        {
+          "label": "Stage 2 (right chamber)",
+          "next": "flow_right_block",
+          "primary": true
+        },
+        {
+          "label": "Not sure",
+          "next": "flow_q4",
+          "primary": false
+        }
+      ]
+    },
+    "flow_left_block": {
+      "text": "Likely blocked left brew piston / valves.",
+      "result": {
+        "title": "Low water flow \u2013 left brew chamber",
+        "likelyCause": "Left brew piston screen or front coffee/drain valves are partially blocked, restricting flow.",
+        "fieldFix": [
+          "Remove mechanical module and clean the left mobile piston screen thoroughly.",
+          "Remove and clean the front four brew solenoid valves (two coffee, two drain) \u2013 look for coffee oils and fines.",
+          "Inspect piston o-rings on the left side for wear or damage and replace if needed.",
+          "Reassemble carefully and rerun rinse to confirm strong flow on stage 1."
+        ],
+        "official": [
+          "Check water connection and pressure (2\u20134 bar).",
+          "Perform water flow test and verify flowmeter pulses via machine tests.",
+          "Check brew chamber heater/NTC readings are within spec if boiler not ready messages are present."
+        ],
+        "warnings": [
+          "Isolate machine before removing modules and solenoid valves.",
+          "Beware of hot surfaces and pressurised lines \u2013 allow boiler and lines to cool where possible."
+        ]
+      }
+    },
+    "flow_right_block": {
+      "text": "Likely blocked right brew piston / valves.",
+      "result": {
+        "title": "Low water flow \u2013 right brew chamber",
+        "likelyCause": "Right brew piston screen or front coffee/drain valves are partially blocked, restricting flow.",
+        "fieldFix": [
+          "Remove mechanical module and clean the right mobile piston screen thoroughly.",
+          "Remove and clean the front four brew solenoid valves (pay attention to orientation).",
+          "Inspect piston o-rings on the right side for wear or damage and replace if needed.",
+          "Reassemble and rerun rinse to confirm strong flow on stage 2."
+        ],
+        "official": [
+          "Check water supply, dynamic pressure and filter condition.",
+          "Run pump and flowmeter checks using the Advanced/Components machine tests.",
+          "If problem persists, check for restriction in hydraulic block and lines."
+        ],
+        "warnings": [
+          "Isolate machine and relieve pressure before opening hydraulic components.",
+          "Follow manufacturer torque and sealing guidelines when refitting valves."
+        ]
+      }
+    },
+    "flow_q4": {
+      "text": "Does the machine show a water flow error or boiler not ready messages?",
+      "note": "Flow errors or boiler not ready can indicate supply, flowmeter or boiler temperature issues in addition to piston blockages.",
+      "options": [
+        {
+          "label": "Yes, I see flow/boiler errors",
+          "next": "flow_result_errors",
+          "primary": true
+        },
+        {
+          "label": "No errors, just generally weak flow",
+          "next": "flow_result_general",
+          "primary": false
+        }
+      ]
+    },
+    "flow_result_errors": {
+      "text": "Combine piston cleaning with supply and sensor checks.",
+      "result": {
+        "title": "Low water flow with error messages",
+        "likelyCause": "Combination of partial blockages and supply/flowmeter or boiler temperature issues.",
+        "fieldFix": [
+          "Clean both brew piston screens and front four brew solenoid valves.",
+          "Verify incoming water pressure (2\u20134 bar dynamic) and check store filter condition.",
+          "Run pump test and confirm flowmeter is registering pulses correctly via machine tests.",
+          "Check NTC sensors on coffee boiler and brew chambers are reading correctly if boiler not ready persists."
+        ],
+        "official": [
+          "Follow manufacturer troubleshooting for Water Flow Error and Boiler Not Ready events.",
+          "Perform cold start rinse and verify boiler fills and heats correctly.",
+          "Use component tests to validate pump, flowmeter and heater/NTC circuits."
+        ],
+        "warnings": [
+          "Always isolate power and follow store lock-out procedures before electrical or hydraulic tests.",
+          "Do not bypass safety devices to keep a faulty machine running."
+        ]
+      }
+    },
+    "flow_result_general": {
+      "text": "Treat as general restriction and supply check.",
+      "result": {
+        "title": "General low water flow",
+        "likelyCause": "Partial restriction in brew pistons/valves plus possible marginal inlet pressure or filter restriction.",
+        "fieldFix": [
+          "Clean both brew pistons and the four front coffee/drain valves.",
+          "Check water filter age/condition and replace if due.",
+          "Confirm water pressure at the machine is within the recommended 2\u20134 bar range.",
+          "Rerun rinse and test a shot to confirm flow has improved."
+        ],
+        "official": [
+          "Verify water supply and filter as per installation manual.",
+          "Run water flow and pump tests from system test menus.",
+          "Check for kinks or restrictions in the water line from pump to machine."
+        ],
+        "warnings": [
+          "Confirm machine is correctly reassembled and leak-free after any internal work.",
+          "Avoid adjusting internal components that affect safety without proper training."
+        ]
+      }
+    },
+    "shot_q1": {
+      "text": "Is water flow normal during rinse on both stages?",
+      "note": "If rinse flow is weak, fix low water flow first. Poor grind is usually not the primary issue in that case.",
+      "options": [
+        {
+          "label": "Yes, rinse flow looks normal",
+          "next": "shot_q2",
+          "primary": true
+        },
+        {
+          "label": "No, rinse flow is weak",
+          "next": "shot_result_flow_first",
+          "primary": false
+        }
+      ]
+    },
+    "shot_q2": {
+      "text": "Are the grinders adjusting when you initialise them in Advanced system tests?",
+      "note": "Service > System Settings > System Test > Advanced then initialise Grinder 1, 2 and 3.",
+      "options": [
+        {
+          "label": "Yes, they adjust",
+          "next": "shot_result_grind_ok",
+          "primary": false
+        },
+        {
+          "label": "No, adjustment seems stuck",
+          "next": "shot_q3",
+          "primary": true
+        },
+        {
+          "label": "Not sure",
+          "next": "shot_q3",
+          "primary": false
+        }
+      ]
+    },
+    "shot_q3": {
+      "text": "Can you free up the adjustment axle manually?",
+      "note": "Vacuum beans out, then gently rotate the adjustment axle with pliers (left = coarser, right = finer).",
+      "options": [
+        {
+          "label": "Yes, axle freed and moves again",
+          "next": "shot_result_freed",
+          "primary": true
+        },
+        {
+          "label": "No, it still binds / seized",
+          "next": "shot_result_grinder_rebuild",
+          "primary": true
+        }
+      ]
+    },
+    "shot_result_flow_first": {
+      "text": "Fix flow issues before chasing grind quality.",
+      "result": {
+        "title": "Shot quality affected by low flow",
+        "likelyCause": "Flow restriction in pistons/valves affecting extraction, not just grind.",
+        "fieldFix": [
+          "Follow the low water flow path to clean brew pistons and solenoids.",
+          "After restoring normal rinse flow, pull test shots and adjust recipes/grind as needed.",
+          "Only move to grinder work once water path is confirmed healthy."
+        ],
+        "official": [
+          "Confirm water quantity and temperature are within spec via machine tests.",
+          "Re-check auto-calibration once flow is corrected."
+        ],
+        "warnings": [
+          "Avoid over-correcting grind or dose while flow is restricted \u2013 this masks the real problem."
+        ]
+      }
+    },
+    "shot_result_grind_ok": {
+      "text": "Grinders adjust, but shot quality is still poor/inconsistent.",
+      "result": {
+        "title": "Shot quality \u2013 grinder movement OK",
+        "likelyCause": "Grinders are mechanically free but calibration, wear or product setup may be off.",
+        "fieldFix": [
+          "Run auto-calibration for each grinder as per procedure.",
+          "Check beans in each hopper match the programmed bean type.",
+          "Inspect for burr wear and replace if badly worn.",
+          "Use a known good recipe and compare left/right brew chambers for consistency."
+        ],
+        "official": [
+          "Follow training guide for grinder calibration and product tuning.",
+          "Verify configuration and product settings match store requirements."
+        ],
+        "warnings": [
+          "Large grind changes have big impact \u2013 adjust in small steps and test after each change."
+        ]
+      }
+    },
+    "shot_result_freed": {
+      "text": "Axle freed and grinders now adjust.",
+      "result": {
+        "title": "Shot quality \u2013 adjustment axle freed",
+        "likelyCause": "Grind adjustment was binding, causing inconsistent or incorrect grind size.",
+        "fieldFix": [
+          "After freeing the axle, run grinder initialisation again for each grinder.",
+          "Run auto-calibration shots until grind is stable and consistent.",
+          "Test extractions on all relevant recipes and adjust slightly finer/coarser as required.",
+          "If binding returns quickly, plan for a proper grinder clean and rebuild."
+        ],
+        "official": [
+          "Follow the grinder service procedure for cleaning, o-ring replacement and lubrication.",
+          "Check auto-calibration values against recommended ranges in the technical manual."
+        ],
+        "warnings": [
+          "Use pliers carefully on adjustment axles to avoid damage.",
+          "Always isolate the machine and confirm grinders are not powered while working inside."
+        ]
+      }
+    },
+    "shot_result_grinder_rebuild": {
+      "text": "Grinder adjustment remains stuck or unreliable.",
+      "result": {
+        "title": "Shot quality \u2013 grinder rebuild required",
+        "likelyCause": "Grinder adjustment mechanism is heavily contaminated or worn, or burrs are at end of life.",
+        "fieldFix": [
+          "Disassemble the grinder module according to the service instructions.",
+          "Clean the adjustment mechanism and threads thoroughly and replace the o-ring.",
+          "Lubricate the moving parts so the top assembly can move freely up and down.",
+          "Inspect burrs for wear and replace if necessary.",
+          "Reassemble, initialise grinder and run auto-calibration shots."
+        ],
+        "official": [
+          "Follow the grinder service and safety procedure from the manufacturer.",
+          "Verify clean, even grind at the target calibration setting before returning machine to service."
+        ],
+        "warnings": [
+          "Take care not to lose small parts or springs while disassembling grinders.",
+          "Keep tools and debris away from open grinder inlets to avoid damage on restart."
+        ]
+      }
+    },
+    "hopper_q1": {
+      "text": "Is the hopper actually filled with beans and properly locked in place?",
+      "note": "Check that the correct beans are present and the hopper is fully seated and locked.",
+      "options": [
+        {
+          "label": "Yes, filled and locked",
+          "next": "hopper_q2",
+          "primary": true
+        },
+        {
+          "label": "No, not properly filled/locked",
+          "next": "hopper_result_fill",
+          "primary": false
+        }
+      ]
+    },
+    "hopper_q2": {
+      "text": "Does the grinder run but beans are not feeding properly?",
+      "note": "Listen for the grinder running with little or no bean movement, or look for bridging in the hopper.",
+      "options": [
+        {
+          "label": "Yes, grinder runs but no feed",
+          "next": "hopper_result_feed",
+          "primary": true
+        },
+        {
+          "label": "No, grinder doesn\u2019t run / error appears immediately",
+          "next": "hopper_result_sensor",
+          "primary": false
+        }
+      ]
+    },
+    "hopper_result_fill": {
+      "text": "Correct hopper fill/lock issues first.",
+      "result": {
+        "title": "Hopper empty \u2013 basic setup",
+        "likelyCause": "Hopper not actually filled or not locked onto the grinder correctly.",
+        "fieldFix": [
+          "Fill hopper with the correct beans as per store spec.",
+          "Confirm hopper is properly seated and locked into position on the grinder.",
+          "Clear any beans caught in the hopper outlet or shutter.",
+          "Test again to see if the empty message clears."
+        ],
+        "official": [
+          "Verify hopper installation according to installation/training documents."
+        ],
+        "warnings": [
+          "Avoid forcing the hopper into place \u2013 check for obstructions if it doesn\u2019t seat cleanly."
+        ]
+      }
+    },
+    "hopper_result_feed": {
+      "text": "Beans present but feed is poor.",
+      "result": {
+        "title": "Hopper empty \u2013 feed problem",
+        "likelyCause": "Beans bridging, oily beans or blockage in hopper throat/grinder inlet giving a false empty condition.",
+        "fieldFix": [
+          "Stir or break up beans in the hopper to clear bridging, especially with oily beans.",
+          "Vacuum out the grinder inlet and hopper throat to remove compacted grinds.",
+          "Check hopper shutter and internal baffles for damage or misalignment.",
+          "Confirm normal feed resumes and the empty message no longer appears in normal use."
+        ],
+        "official": [
+          "Inspect hopper and grinder inlet per service instructions for obstructions or damage."
+        ],
+        "warnings": [
+          "Ensure the grinder cannot start unexpectedly while your hands are near the inlet.",
+          "Do not use sharp tools inside the grinder throat that could damage components."
+        ]
+      }
+    },
+    "hopper_result_sensor": {
+      "text": "Likely sensor or detection issue rather than feed only.",
+      "result": {
+        "title": "Hopper empty \u2013 detection/sensor issue",
+        "likelyCause": "Hopper presence/level sensor not detecting correctly, or magnet/flag alignment issue.",
+        "fieldFix": [
+          "Clean the area around the hopper sensor and magnet or flag.",
+          "Check the hopper is correctly aligned so the sensor can see it.",
+          "Inspect the sensor wiring/connector for damage or loose fit.",
+          "If all mechanical causes are excluded, plan to replace the hopper sensor assembly."
+        ],
+        "official": [
+          "Run component tests to check hopper sensor status if available in the menu.",
+          "Consult event list and electrical checks for hopper sensor circuit."
+        ],
+        "warnings": [
+          "Isolate machine before handling sensor wiring or boards.",
+          "Do not bypass hopper safety or presence sensors."
+        ]
+      }
+    },
+    "steam_q1": {
+      "text": "Is steam pressure on the gauge within the normal range?",
+      "note": "If pressure is low or unstable, address steam boiler issues before chasing temperature calibration.",
+      "options": [
+        {
+          "label": "Yes, pressure looks normal",
+          "next": "steam_q2",
+          "primary": true
+        },
+        {
+          "label": "No, pressure is low/unstable",
+          "next": "steam_result_pressure",
+          "primary": false
+        }
+      ]
+    },
+    "steam_q2": {
+      "text": "Is steam or hot water escaping from the tundish/drain under the counter?",
+      "note": "Constant steam at the tundish can indicate boiler overfill and relief valve lift.",
+      "options": [
+        {
+          "label": "Yes, steam from tundish",
+          "next": "steam_result_tundish",
+          "primary": true
+        },
+        {
+          "label": "No, no steam from tundish",
+          "next": "steam_q3",
+          "primary": false
+        }
+      ]
+    },
+    "steam_q3": {
+      "text": "After calibrating the steam outlet NTC in service menu, are the temperature readings consistent over multiple calibrations?",
+      "note": "Login: 1423 \u2192 System Settings \u2192 Calibration \u2192 Steam Outlet NTC.",
+      "options": [
+        {
+          "label": "Yes, readings consistent",
+          "next": "steam_result_cal_ok",
+          "primary": true
+        },
+        {
+          "label": "No, readings inconsistent",
+          "next": "steam_result_ntc",
+          "primary": true
+        }
+      ]
+    },
+    "steam_result_pressure": {
+      "text": "Address boiler pressure/heat first.",
+      "result": {
+        "title": "Steam temperature \u2013 boiler pressure issue",
+        "likelyCause": "Steam boiler not reaching or holding proper pressure, causing incorrect steaming temperature.",
+        "fieldFix": [
+          "Check steam boiler heating, level control and safety devices according to the troubleshooting guide.",
+          "Verify water supply to the steam boiler is correct and not over- or under-filling.",
+          "Once pressure is stable and in range, re-check steaming temperature and calibrate if needed."
+        ],
+        "official": [
+          "Follow manufacturer troubleshooting for steam boiler not ready/boiler controller errors.",
+          "Run component tests on steam heater, NTC and level probes."
+        ],
+        "warnings": [
+          "Steam boilers contain high pressure and temperature \u2013 only work on them if you are trained and authorised.",
+          "Always isolate and depressurise safely before opening steam components."
+        ]
+      }
+    },
+    "steam_result_tundish": {
+      "text": "Steam seen at the tundish/drain usually indicates overfilling and relief valve lift.",
+      "result": {
+        "title": "Steam from tundish \u2013 boiler overfilling",
+        "likelyCause": "Scale build-up on steam boiler level probes causing overfill and lifting the pressure relief valve.",
+        "fieldFix": [
+          "Inspect and clean the steam boiler level probes for scale build-up.",
+          "Replace level probes if badly scaled or damaged.",
+          "Verify the fill valve operation and correct boiler fill level after cleaning.",
+          "Confirm no further steam is venting at the tundish during normal operation."
+        ],
+        "official": [
+          "Perform level probe and fill circuit checks as described in the steam troubleshooting section.",
+          "Verify correct operation of the safety/relief valve."
+        ],
+        "warnings": [
+          "Treat steam venting from the tundish as a safety issue \u2013 do not ignore it.",
+          "Allow the system to cool and depressurise where possible before removing probes."
+        ]
+      }
+    },
+    "steam_result_cal_ok": {
+      "text": "Calibration stable and steaming temperature now correct.",
+      "result": {
+        "title": "Steam temperature \u2013 calibration resolved",
+        "likelyCause": "Steam outlet NTC calibration was off and has now been corrected.",
+        "fieldFix": [
+          "After performing the Steam Outlet NTC calibration several times with consistent results, test multiple milk drinks.",
+          "Confirm milk temperature at the pitcher matches expected values for store recipes.",
+          "If readings remain stable and results are acceptable, no hardware replacement is needed."
+        ],
+        "official": [
+          "Follow the calibration procedure exactly as per the installation/training guide.",
+          "Document the calibration and final temperature readings if required by store procedures."
+        ],
+        "warnings": [
+          "Use a reliable thermometer when validating steaming temperature.",
+          "Avoid over-heating milk while testing to prevent waste and poor taste."
+        ]
+      }
+    },
+    "steam_result_ntc": {
+      "text": "Inconsistent calibration suggests NTC probe issues.",
+      "result": {
+        "title": "Steam temperature \u2013 suspect wand NTC",
+        "likelyCause": "Steam wand NTC probe or wiring is faulty, giving inconsistent readings.",
+        "fieldFix": [
+          "Inspect the steam wand NTC probe and wiring for damage, loose connections or moisture ingress.",
+          "Replace the steam wand NTC probe if calibration values are inconsistent despite proper procedure.",
+          "After replacement, re-run Steam Outlet NTC calibration several times and validate with a thermometer."
+        ],
+        "official": [
+          "Follow manufacturer instructions for replacing the steam outlet NTC probe.",
+          "Verify error logs and event list for related component errors."
+        ],
+        "warnings": [
+          "Isolate the machine before handling any electrical connections on the steam wand.",
+          "Confirm correct routing of the new NTC cable to avoid heat damage."
+        ]
+      }
+    },
+    "drawer_q1": {
+      "text": "Is water build-up mainly on one side of the divided grounds drawer?",
+      "note": "The drawer is split for left/right; one-sided water build-up often points to a piston seal issue on that side.",
+      "options": [
+        {
+          "label": "Yes, mostly one side",
+          "next": "drawer_result_one_side",
+          "primary": true
+        },
+        {
+          "label": "No, fairly even on both sides",
+          "next": "drawer_result_even",
+          "primary": false
+        }
+      ]
+    },
+    "drawer_result_one_side": {
+      "text": "Likely a leaking piston on the affected side.",
+      "result": {
+        "title": "Water in grounds drawer \u2013 one side",
+        "likelyCause": "Piston o-ring on the affected side is worn/damaged, allowing extra water into that half of the drawer.",
+        "fieldFix": [
+          "Identify whether the left or right side of the drawer is filling faster.",
+          "Inspect the corresponding brew piston and o-ring for wear or damage.",
+          "Replace the piston o-ring and check sealing surfaces, cleaning any coffee residue.",
+          "After reassembly, run several rinse/shot cycles and re-check water accumulation pattern."
+        ],
+        "official": [
+          "Follow official procedure for brew piston seal replacement.",
+          "Check for any related piston or brew chamber errors in the event log."
+        ],
+        "warnings": [
+          "Isolate the machine before removing mechanical/brew components.",
+          "Ensure the piston is correctly reassembled to avoid further leaks or mechanical faults."
+        ]
+      }
+    },
+    "drawer_result_even": {
+      "text": "Small even build-up may be normal; large amounts may indicate multiple minor leaks.",
+      "result": {
+        "title": "Water in grounds drawer \u2013 both sides",
+        "likelyCause": "Normal rinse water plus possible minor leakage on both pistons or from cleaning cycles.",
+        "fieldFix": [
+          "Understand that a small amount of water in the drawer, particularly after a clean cycle, is considered normal.",
+          "If water level is excessive, inspect both pistons and seals for wear and replace if necessary.",
+          "Check for any misalignment causing water to run into the drawer instead of drains.",
+          "Monitor over several days to confirm whether the issue persists after seal work."
+        ],
+        "official": [
+          "Refer to service documentation for acceptable water levels and seal inspection procedures."
+        ],
+        "warnings": [
+          "Do not ignore persistent heavy water accumulation \u2013 it may hide other leaks.",
+          "Ensure the grounds drawer is always re-installed correctly to avoid nuisance errors."
+        ]
+      }
+    }
+  }
+}

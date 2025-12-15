@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TechWizard — Troubleshooting Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#020617">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-alt: #0f172a;
+      --card: #020617;
+      --border: #1f2937;
+      --accent: #22c55e;
+      --accent-soft: #bbf7d0;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 40%, #020617 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 16px;
+    }
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow: 0 24px 80px rgba(15,23,42,0.9);
+      padding: 16px 16px 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .title-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-pill {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 20%, #bbf7d0 0, #22c55e 40%, #15803d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #022c22;
+      font-size: 20px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .app-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(52,211,153,0.7);
+      background: rgba(6,95,70,0.25);
+      font-size: 11px;
+      color: #a7f3d0;
+      text-align: right;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 768px) {
+      main {
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+    }
+    .card {
+      background: rgba(15,23,42,0.98);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 12px;
+    }
+    .card-header {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .card-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .machine-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .machine-btn {
+      width: 100%;
+      text-align: left;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 8px 9px;
+      background: #020617;
+      color: var(--text-main);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .machine-btn span.main {
+      font-weight: 600;
+    }
+    .machine-btn span.sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .machine-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.45);
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), #020617 70%);
+    }
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .symptom-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .symptom-btn {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      background: #020617;
+      color: var(--text-main);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .symptom-btn span.title {
+      font-weight: 500;
+    }
+    .symptom-btn span.desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .wizard-step {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wizard-step.active {
+      display: flex;
+    }
+    .step-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .step-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .step-note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .option-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .option-btn {
+      flex: 1 1 90px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      background: #020617;
+      color: var(--text-main);
+      text-align: center;
+    }
+    .option-btn.primary {
+      border-color: var(--accent);
+      background: radial-gradient(circle at top, rgba(34,197,94,0.35), #022c22);
+    }
+    .option-btn.secondary {
+      color: var(--text-muted);
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .result-block {
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      padding: 8px 9px;
+      background: rgba(15,23,42,0.9);
+      font-size: 12px;
+    }
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .result-section {
+      margin-top: 4px;
+    }
+    .result-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+    ul.result-list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+    }
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      flex: 1 1 120px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text-main);
+      font-size: 11px;
+      padding: 6px 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .nav-btn.alt {
+      color: var(--text-muted);
+    }
+    footer {
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+  
+    .resume-bar{
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255,255,255,0.02);
+    }
+    .resume-title{ font-size: 12px; font-weight: 700; letter-spacing: 0.02em; }
+    .resume-meta{ font-size: 11px; opacity: 0.8; margin-top: 2px; }
+    .resume-actions{ display:flex; gap:8px; }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-area">
+        <div class="logo-pill">T</div>
+        <div>
+          <div class="app-title">TechWizard</div>
+          <div class="app-subtitle">Guided troubleshooting for commercial coffee & food equipment</div>
+        </div>
+      </div>
+      <div class="status-pill">
+        OFFLINE READY<br><span style="font-size:9px;opacity:0.8;">Multi-machine decision tree</span>
+      </div>
+    </header>
+    <main>
+      <section class="card" id="machinePanel">
+        <div class="card-header">1. Select machine</div>
+        <div class="card-sub">Pick the machine you’re working on, then choose the symptom.</div>
+        <div class="machine-list" id="machineList"></div>
+        <div class="resume-bar" id="resumeBar" style="display:none;">
+          <div class="resume-left">
+            <div class="resume-title">Resume last session</div>
+            <div class="resume-meta" id="resumeMeta"></div>
+          </div>
+          <div class="resume-actions">
+            <button class="btn secondary" id="clearResumeBtn" type="button">Clear</button>
+            <button class="btn primary" id="resumeBtn" type="button">Resume</button>
+          </div>
+        </div>
+
+      </section>
+      <section class="card">
+        <div class="card-header" id="contextTitle">2. Select symptom</div>
+        <div class="card-sub" id="contextSubtitle">You’ll get simple yes/no questions and field-tested fixes.</div>
+        <div id="symptomPanel">
+          <div class="symptom-list" id="symptomList"></div>
+          <div class="wizard-step" id="wizardStep">
+            <div class="step-label" id="stepLabel"></div>
+            <div class="step-text" id="stepText"></div>
+            <div class="step-note" id="stepNote"></div>
+            <div class="option-grid" id="optionGrid"></div>
+            <div class="result-block" id="resultBlock" style="display:none;">
+              <div class="result-title" id="resultTitle"></div>
+              <div class="pill-row" id="resultTags"></div>
+              <div class="result-section" id="resultLikely"></div>
+              <div class="result-section" id="resultField"></div>
+              <div class="result-section" id="resultOfficial"></div>
+              <div class="result-section" id="resultWarnings"></div>
+            </div>
+            <div class="nav-row">
+              <button type="button" class="nav-btn alt" id="backStepBtn">◀ Previous step</button>
+              <button type="button" class="nav-btn" id="restartSymptomBtn">↻ Restart this symptom</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      TechWizard — local tool, no internet required. Built for techs, not manuals.
+    </footer>
+  </div>
+  <script src="wizard.js"></script>
+</body>
+</html>

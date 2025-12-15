@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "machines": [
+    {
+      "id": "mastrena2",
+      "name": "Mastrena II",
+      "subtitle": "Superauto espresso",
+      "tag": "Coffee",
+      "config": "machines/mastrena2.json"
+    }
+  ]
+}
