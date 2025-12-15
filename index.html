@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+  if (location.pathname.startsWith("/TechNinja")) {
+    location.replace(
+      location.href.replace("/TechNinja", "/techninja")
+    );
+  }
+</script>
+
   <meta charset="UTF-8">
   <title>TechWizard — Troubleshooting Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
