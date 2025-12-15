@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "machine": "Alpha",
+  "meta": {
+    "manufacturer": "Melitta",
+    "model": "Cafina Alpha",
+    "introducedBy": "Manual-derived (TechNinja)",
+    "lastUpdated": "2025-12-15",
+    "notes": "Initial skeleton created from Alpha service manual and training documentation. Conservative, low-confidence entries only."
+  },
+  "symptoms": [
+    {
+      "id": "not_dispensing_coffee",
+      "name": "Not dispensing coffee",
+      "description": "Machine does not dispense coffee when selected",
+      "start": "alpha_unknown_investigation"
+    },
+    {
+      "id": "poor_coffee_quality",
+      "name": "Poor coffee quality",
+      "description": "Bad taste, no crema, incorrect volume or flow",
+      "start": "alpha_unknown_investigation"
+    },
+    {
+      "id": "milk_not_dispensing",
+      "name": "Milk not dispensing or poor milk quality",
+      "description": "Milk not flowing, dripping, poor foam, cold milk",
+      "start": "alpha_unknown_investigation"
+    },
+    {
+      "id": "flow_or_pressure_issue",
+      "name": "Water flow or pressure issue",
+      "description": "Low flow, dripping, or pressure-related issues",
+      "start": "alpha_unknown_investigation"
+    },
+    {
+      "id": "steam_temperature_issue",
+      "name": "Steam temperature or pressure issue",
+      "description": "Steam too weak, too strong, or unstable",
+      "start": "alpha_unknown_investigation"
+    }
+  ],
+  "steps": {
+    "alpha_unknown_investigation": {
+      "text": "Begin investigation using Alpha service and training procedures.",
+      "result": {
+        "title": "Investigation required (manual-guided)",
+        "likelyCause": "Multiple possible causes depending on calibration, supply conditions, cleaning state, or component condition.",
+        "fieldFix": [
+          "Verify water supply pressure is within 2.5–5 bar.",
+          "Confirm correct water filtration and bypass setting.",
+          "Check pump pressure is set to approximately 8.5–9 bar.",
+          "Run flowmeter tests (Y1 infusion and Y3 bypass) via service menu.",
+          "Check grinder blade wear and grind time.",
+          "Calibrate piston via service menu if piston errors are present.",
+          "Verify steam boiler pressure is set to approximately 1.1–1.2 bar.",
+          "Confirm milk system and cleaning cycles have been performed correctly."
+        ],
+        "official": [
+          "Refer to Alpha Service Manual V3.0.",
+          "Refer to Alpha Training Presentation (20.11.21)."
+        ],
+        "warnings": [
+          "Steam boiler contains pressurised hot water and steam.",
+          "Depressurise and isolate machine before opening hydraulic components.",
+          "Incorrect calibration can mimic component failure."
+        ],
+        "confidence": "low",
+        "provenance": "manual"
+      }
+    }
+  }
+}
