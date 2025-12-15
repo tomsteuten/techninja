@@ -10,3 +10,10 @@
     }
   ]
 }
+{
+  "id": "alpha",
+  "name": "Alpha",
+  "subtitle": "Melitta Cafina Alpha",
+  "tag": "Coffee",
+  "config": "machines/alpha.v1.json"
+}
