@@ -7,13 +7,13 @@
       "subtitle": "Superauto espresso",
       "tag": "Coffee",
       "config": "machines/mastrena2.v2.json"
+    },
+    {
+      "id": "alpha",
+      "name": "Alpha",
+      "subtitle": "Melitta Cafina Alpha",
+      "tag": "Coffee",
+      "config": "machines/alpha.v1.json"
     }
   ]
-}
-{
-  "id": "alpha",
-  "name": "Alpha",
-  "subtitle": "Melitta Cafina Alpha",
-  "tag": "Coffee",
-  "config": "machines/alpha.v1.json"
 }
