@@ -1,0 +1,429 @@
+{
+  "schemaVersion": "1.0",
+  "machine": "Mastrena II",
+  "meta": {
+    "manufacturer": "Thermoplan",
+    "model": "Mastrena II",
+    "introducedBy": "Tom Steuten",
+    "lastUpdated": "2025-12-15",
+    "notes": "Migrated from legacy mastrena2.json into templated schema with confidence metadata."
+  },
+  "symptoms": [
+    {
+      "id": "low_water_flow",
+      "name": "Low water flow",
+      "description": "Weak or slow flow during rinse or shots",
+      "start": "flow_q1"
+    },
+    {
+      "id": "shot_quality",
+      "name": "Poor / inconsistent shot quality",
+      "description": "Shots running too fast/slow, uneven or bad quality",
+      "start": "shot_q1"
+    },
+    {
+      "id": "hopper_empty",
+      "name": "Hopper empty message",
+      "description": "‘Hopper empty’ error even with beans present",
+      "start": "hopper_q1"
+    },
+    {
+      "id": "steam_temp",
+      "name": "Steaming to wrong temperature",
+      "description": "Milk too hot / too cold compared to setpoint",
+      "start": "steam_q1"
+    },
+    {
+      "id": "water_in_grounds",
+      "name": "Water in grounds drawer",
+      "description": "Excess water building up in grounds drawer",
+      "start": "drawer_q1"
+    }
+  ],
+  "steps": {
+    "flow_q1": {
+      "text": "Is the issue only on one brew chamber (left or right) when you run a rinse?",
+      "note": "Run a rinse and watch which stage has weak flow: stage 1 = left chamber, stage 2 = right chamber.",
+      "options": [
+        {
+          "label": "Yes, only one side is weak",
+          "next": "flow_q2",
+          "primary": true
+        },
+        {
+          "label": "No, both sides are weak / unclear",
+          "next": "flow_q4"
+        }
+      ]
+    },
+    "flow_q2": {
+      "text": "Which stage during rinse has weak flow?",
+      "note": "Stage 1 is left brew chamber, stage 2 is right brew chamber.",
+      "options": [
+        {
+          "label": "Stage 1 (left chamber)",
+          "next": "flow_left_block",
+          "primary": true
+        },
+        {
+          "label": "Stage 2 (right chamber)",
+          "next": "flow_right_block",
+          "primary": true
+        },
+        {
+          "label": "Not sure",
+          "next": "flow_q4"
+        }
+      ]
+    },
+    "flow_q4": {
+      "text": "Does the machine show a water flow error or boiler not ready messages?",
+      "note": "Flow errors or boiler not ready can indicate supply, flowmeter or boiler temperature issues.",
+      "options": [
+        {
+          "label": "Yes, I see flow/boiler errors",
+          "next": "flow_result_errors",
+          "primary": true
+        },
+        {
+          "label": "No errors, just generally weak flow",
+          "next": "flow_result_general"
+        }
+      ]
+    },
+    "flow_left_block": {
+      "text": "Likely blocked left brew piston / valves.",
+      "result": {
+        "title": "Low water flow – left brew chamber",
+        "likelyCause": "Left brew piston screen or front coffee/drain valves are partially blocked.",
+        "fieldFix": [
+          "Clean left mobile piston screen.",
+          "Clean front four brew solenoid valves.",
+          "Inspect and replace left piston o-rings if required."
+        ],
+        "official": [
+          "Check water pressure (2–4 bar).",
+          "Verify flowmeter pulses."
+        ],
+        "warnings": [
+          "Isolate machine before opening hydraulic components."
+        ],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "flow_right_block": {
+      "text": "Likely blocked right brew piston / valves.",
+      "result": {
+        "title": "Low water flow – right brew chamber",
+        "likelyCause": "Right brew piston screen or front coffee/drain valves are partially blocked.",
+        "fieldFix": [
+          "Clean right mobile piston screen.",
+          "Clean front four brew solenoid valves.",
+          "Inspect and replace right piston o-rings if required."
+        ],
+        "official": [
+          "Check water pressure and filter condition."
+        ],
+        "warnings": [
+          "Relieve pressure before opening hydraulic components."
+        ],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "flow_result_errors": {
+      "text": "Combine piston cleaning with supply and sensor checks.",
+      "result": {
+        "title": "Low water flow with error messages",
+        "likelyCause": "Partial blockages combined with supply or sensor issues.",
+        "fieldFix": [
+          "Clean both pistons and solenoids.",
+          "Verify inlet pressure and flowmeter operation."
+        ],
+        "official": [
+          "Follow OEM flow and boiler troubleshooting."
+        ],
+        "warnings": [
+          "Do not bypass safety devices."
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "flow_result_general": {
+      "text": "Treat as general restriction and supply check.",
+      "result": {
+        "title": "General low water flow",
+        "likelyCause": "General restriction or marginal inlet pressure.",
+        "fieldFix": [
+          "Clean pistons and valves.",
+          "Replace water filter if due."
+        ],
+        "official": [
+          "Verify installation water specs."
+        ],
+        "warnings": [
+          "Confirm machine is leak-free after work."
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "shot_q1": {
+      "text": "Is water flow normal during rinse on both stages?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "shot_q2",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "shot_result_flow_first"
+        }
+      ]
+    },
+    "shot_q2": {
+      "text": "Are the grinders adjusting when initialised?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "shot_result_grind_ok"
+        },
+        {
+          "label": "No / not sure",
+          "next": "shot_q3",
+          "primary": true
+        }
+      ]
+    },
+    "shot_q3": {
+      "text": "Can the adjustment axle be freed manually?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "shot_result_freed",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "shot_result_grinder_rebuild"
+        }
+      ]
+    },
+    "shot_result_flow_first": {
+      "text": "Fix flow issues first.",
+      "result": {
+        "title": "Shot quality affected by low flow",
+        "likelyCause": "Flow restriction impacting extraction.",
+        "fieldFix": [
+          "Resolve low flow before adjusting grind."
+        ],
+        "official": [],
+        "warnings": [
+          "Avoid masking flow issues with grind changes."
+        ],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "shot_result_grind_ok": {
+      "text": "Grinders adjust normally.",
+      "result": {
+        "title": "Shot quality – grinder movement OK",
+        "likelyCause": "Calibration or burr wear issue.",
+        "fieldFix": [
+          "Run grinder auto-calibration.",
+          "Inspect burr wear."
+        ],
+        "official": [
+          "Follow OEM grinder calibration procedure."
+        ],
+        "warnings": [],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "shot_result_freed": {
+      "text": "Axle freed.",
+      "result": {
+        "title": "Shot quality – adjustment freed",
+        "likelyCause": "Binding adjustment axle.",
+        "fieldFix": [
+          "Re-initialise grinders.",
+          "Plan rebuild if binding returns."
+        ],
+        "official": [],
+        "warnings": [
+          "Avoid damaging axle threads."
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "shot_result_grinder_rebuild": {
+      "text": "Grinder rebuild required.",
+      "result": {
+        "title": "Shot quality – grinder rebuild required",
+        "likelyCause": "Contamination or worn adjustment mechanism.",
+        "fieldFix": [
+          "Strip and clean grinder.",
+          "Replace worn burrs and seals."
+        ],
+        "official": [
+          "Follow grinder rebuild procedure."
+        ],
+        "warnings": [
+          "Account for small parts during disassembly."
+        ],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "hopper_q1": {
+      "text": "Is hopper filled and locked?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "hopper_q2",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "hopper_result_fill"
+        }
+      ]
+    },
+    "hopper_q2": {
+      "text": "Does grinder run but not feed beans?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "hopper_result_feed",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "hopper_result_sensor"
+        }
+      ]
+    },
+    "hopper_result_fill": {
+      "text": "Correct hopper setup.",
+      "result": {
+        "title": "Hopper empty – setup issue",
+        "likelyCause": "Hopper not filled or locked.",
+        "fieldFix": [
+          "Fill and lock hopper correctly."
+        ],
+        "official": [],
+        "warnings": [],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "hopper_result_feed": {
+      "text": "Beans not feeding.",
+      "result": {
+        "title": "Hopper empty – feed issue",
+        "likelyCause": "Bean bridging or blockage.",
+        "fieldFix": [
+          "Clear hopper and grinder inlet."
+        ],
+        "official": [],
+        "warnings": [],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "hopper_result_sensor": {
+      "text": "Sensor issue.",
+      "result": {
+        "title": "Hopper empty – sensor issue",
+        "likelyCause": "Hopper sensor not detecting correctly.",
+        "fieldFix": [
+          "Inspect sensor and wiring."
+        ],
+        "official": [],
+        "warnings": [
+          "Do not bypass safety sensors."
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "steam_q1": {
+      "text": "Is steam pressure normal?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "steam_q2",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "steam_result_pressure"
+        }
+      ]
+    },
+    "steam_result_pressure": {
+      "text": "Boiler pressure issue.",
+      "result": {
+        "title": "Steam temperature – boiler pressure issue",
+        "likelyCause": "Steam boiler not stable.",
+        "fieldFix": [
+          "Check steam boiler heating and level."
+        ],
+        "official": [],
+        "warnings": [
+          "Steam boiler is high pressure."
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+    "drawer_q1": {
+      "text": "Is water mainly on one side of drawer?",
+      "options": [
+        {
+          "label": "Yes",
+          "next": "drawer_result_one_side",
+          "primary": true
+        },
+        {
+          "label": "No",
+          "next": "drawer_result_even"
+        }
+      ]
+    },
+    "drawer_result_one_side": {
+      "text": "Likely leaking piston.",
+      "result": {
+        "title": "Water in grounds drawer – one side",
+        "likelyCause": "Worn piston seal.",
+        "fieldFix": [
+          "Replace affected piston o-ring."
+        ],
+        "official": [],
+        "warnings": [],
+        "confidence": "high",
+        "provenance": "field-confirmed"
+      }
+    },
+    "drawer_result_even": {
+      "text": "Even water build-up.",
+      "result": {
+        "title": "Water in grounds drawer – both sides",
+        "likelyCause": "Normal rinse water or minor leakage.",
+        "fieldFix": [
+          "Monitor and inspect seals if excessive."
+        ],
+        "official": [],
+        "warnings": [],
+        "confidence": "low",
+        "provenance": "anecdotal"
+      }
+    }
+  }
+}
