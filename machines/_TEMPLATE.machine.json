@@ -1,0 +1,140 @@
+# TechNinja Machine JSON Template
+
+**File name:** `_TEMPLATE.machine.json`
+
+This file is the **canonical starting point** for adding any new machine to TechNinja.
+
+Do **not** copy an existing machine file as a base. Always start from this template.
+
+---
+
+## Template
+
+```json
+{
+  "schemaVersion": "1.0",
+
+  "machine": "Machine display name (shown to technicians)",
+
+  "meta": {
+    "manufacturer": "",
+    "model": "",
+    "introducedBy": "",
+    "lastUpdated": "",
+    "notes": ""
+  },
+
+  "symptoms": [
+    {
+      "id": "example_symptom_id",
+      "name": "What the technician is experiencing",
+      "description": "Optional clarifying detail",
+      "start": "step_start"
+    }
+  ],
+
+  "steps": {
+    "step_start": {
+      "text": "First diagnostic question or action",
+      "note": "Optional technician hint or context",
+      "options": [
+        {
+          "label": "Yes / condition met",
+          "next": "step_followup",
+          "primary": true
+        },
+        {
+          "label": "No / condition not met",
+          "next": "result_unknown"
+        }
+      ]
+    },
+
+    "step_followup": {
+      "text": "Follow-up diagnostic step",
+      "options": [
+        {
+          "label": "Confirmed",
+          "next": "result_confirmed"
+        },
+        {
+          "label": "Not confirmed",
+          "next": "result_unknown"
+        }
+      ]
+    },
+
+    "result_confirmed": {
+      "text": "Fault identified",
+      "result": {
+        "title": "Confirmed fault name",
+        "likelyCause": "Short explanation of why this fault occurs",
+        "fieldFix": [
+          "Practical field fix steps",
+          "Things a technician can realistically do onsite"
+        ],
+        "official": [
+          "OEM-recommended fix or service manual reference"
+        ],
+        "warnings": [
+          "Safety, warranty, or repeat-visit warnings"
+        ],
+        "confidence": "medium",
+        "provenance": "field-confirmed"
+      }
+    },
+
+    "result_unknown": {
+      "text": "Unable to confirm fault",
+      "result": {
+        "title": "Unconfirmed fault",
+        "likelyCause": "Insufficient or conflicting data",
+        "fieldFix": [],
+        "official": [],
+        "warnings": [],
+        "confidence": "low",
+        "provenance": "anecdotal"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Required conventions
+
+### IDs
+
+* All `id` and `step_*` values are **stable identifiers**
+* Never rename IDs once published
+* Use lowercase, underscores, no spaces
+
+### Navigation
+
+* Every `next` value **must exist** as a step key
+* Terminal steps are detected **only** by the presence of `result`
+
+### Confidence & provenance
+
+Allowed values:
+
+* `confidence`: `low`, `medium`, `high`
+* `provenance`: `manual`, `field-confirmed`, `anecdotal`
+
+Rules:
+
+* `high` confidence requires `manual` or `field-confirmed`
+* Absence of these fields implies **unknown**, not high confidence
+
+---
+
+## Intent
+
+This template prioritises:
+
+* Field usability
+* Explicit uncertainty
+* Survivability under handover
+
+If you are unsure, choose **lower confidence** and document uncertainty.
