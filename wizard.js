@@ -1,3 +1,6 @@
+const TECHNINJA_BUILD = "2025-03-16";
+const TECHNINJA_DATA_VERSION = "0.4";
+
 (function () {
   var machines = [];
   var currentMachine = null;
