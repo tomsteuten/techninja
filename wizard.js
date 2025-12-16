@@ -50,6 +50,53 @@ const TECHNINJA_DATA_VERSION = "0.4";
     renderResumeBar();
   }
 
+  function renderResumeBar() {
+    var bar = $("resumeBar");
+    if (!bar) return;
+
+    var s = loadSession();
+    if (!s || !s.machineId) {
+      bar.style.display = "none";
+      return;
+    }
+
+    var m = machines.find(function (x) { return x.id === s.machineId; });
+    if (!m) {
+      bar.style.display = "none";
+      return;
+    }
+
+    var meta = $("resumeMeta");
+    if (meta) {
+      var parts = [];
+      parts.push(m.name || s.machineId);
+      if (s.symptomId) parts.push("symptom: " + s.symptomId);
+      if (s.stepId) parts.push("step: " + s.stepId);
+      if (s.ts) {
+        try {
+          parts.push("saved: " + new Date(s.ts).toLocaleString());
+        } catch (e) {}
+      }
+      meta.textContent = parts.join(" • ");
+    }
+
+    var resumeBtn = $("resumeBtn");
+    if (resumeBtn) {
+      resumeBtn.onclick = function () {
+        resumeFromSession(s);
+      };
+    }
+
+    var clearBtn = $("clearResumeBtn");
+    if (clearBtn) {
+      clearBtn.onclick = function () {
+        clearSession();
+      };
+    }
+
+    bar.style.display = "flex";
+  }
+
   /* =========================
      DEV WARNINGS (FAIL-LOUD)
   ========================== */
@@ -83,17 +130,17 @@ const TECHNINJA_DATA_VERSION = "0.4";
 
     (machine.symptoms || []).forEach(function (s) {
       if (!stepIds.has(s.start)) {
-        warn(`Symptom "${s.id}" starts at missing step "${s.start}"`);
+        warn('Symptom "' + s.id + '" starts at missing step "' + s.start + '"');
       }
     });
 
     Object.keys(machine.steps).forEach(function (id) {
       var step = machine.steps[id];
       if (step.next && !stepIds.has(step.next)) {
-        warn(`Step "${id}" points to missing next "${step.next}"`);
+        warn('Step "' + id + '" points to missing next "' + step.next + '"');
       }
       if (step.result && !step.result.confidence) {
-        warn(`Result at step "${id}" missing confidence metadata`);
+        warn('Result at step "' + id + '" missing confidence metadata');
       }
     });
   }
@@ -147,15 +194,26 @@ const TECHNINJA_DATA_VERSION = "0.4";
       btn.className = "machine-btn";
       btn.dataset.id = m.id;
 
+      var leftWrap = document.createElement("div");
+      leftWrap.style.display = "flex";
+      leftWrap.style.flexDirection = "column";
+
       var main = document.createElement("span");
       main.className = "main";
       main.textContent = m.name;
-      btn.appendChild(main);
+      leftWrap.appendChild(main);
 
       var sub = document.createElement("span");
       sub.className = "sub";
       sub.textContent = m.subtitle || "";
-      btn.appendChild(sub);
+      leftWrap.appendChild(sub);
+
+      btn.appendChild(leftWrap);
+
+      var tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = m.tag || "Machine";
+      btn.appendChild(tag);
 
       btn.onclick = function () { selectMachine(m.id); };
       list.appendChild(btn);
@@ -179,7 +237,10 @@ const TECHNINJA_DATA_VERSION = "0.4";
         currentMachine.configData = cfg;
         warnOnMachineData(cfg);
         renderSymptoms();
-        $("contextTitle").textContent = "2. Select symptom for " + currentMachine.name;
+        $("contextTitle").textContent =
+          "2. Select symptom for " + currentMachine.name;
+        $("contextSubtitle").textContent =
+          "Tap a symptom to start a guided troubleshooting flow.";
       })
       .catch(function (e) {
         error("Failed to load machine config", e);
@@ -217,14 +278,32 @@ const TECHNINJA_DATA_VERSION = "0.4";
     var cfg = currentMachine && currentMachine.configData;
     if (!cfg || !cfg.symptoms) {
       panel.innerHTML =
-        "<div style='font-size:12px;color:#9ca3af;'>No symptom data.</div>";
+        "<div style='font-size:12px;color:#9ca3af;'>No symptom data for this machine.</div>";
       return;
     }
 
     cfg.symptoms.forEach(function (s) {
       var btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "symptom-btn";
-      btn.textContent = s.name;
+
+      var left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.flexDirection = "column";
+
+      var t = document.createElement("span");
+      t.className = "title";
+      t.textContent = s.name;
+      left.appendChild(t);
+
+      if (s.description) {
+        var d = document.createElement("span");
+        d.className = "desc";
+        d.textContent = s.description;
+        left.appendChild(d);
+      }
+
+      btn.appendChild(left);
       btn.onclick = function () { startSymptom(s.id); };
       panel.appendChild(btn);
     });
@@ -232,15 +311,18 @@ const TECHNINJA_DATA_VERSION = "0.4";
 
   function startSymptom(symptomId) {
     var cfg = currentMachine.configData;
-    currentSymptom = cfg.symptoms.find(function (s) { return s.id === symptomId; });
+    var s = cfg.symptoms.find(function (x) { return x.id === symptomId; });
+    if (!s) return;
+    currentSymptom = s;
     stepHistory = [];
-    currentStepId = currentSymptom.start;
+    currentStepId = s.start;
     renderCurrentStep();
     saveSession();
   }
 
   function renderCurrentStep() {
-    var steps = currentMachine.configData.steps;
+    if (!currentMachine || !currentSymptom || !currentMachine.configData) return;
+    var steps = currentMachine.configData.steps || {};
     var step = steps[currentStepId];
     if (!step) {
       error("Missing step", currentStepId);
@@ -248,29 +330,47 @@ const TECHNINJA_DATA_VERSION = "0.4";
     }
 
     $("wizardStep").classList.add("active");
-    $("stepText").textContent = step.text || "";
+    $("symptomList").style.display = "flex";
 
+    $("stepLabel").textContent = "Step " + (stepHistory.length + 1);
+    $("stepText").textContent = step.text || "";
+    $("stepNote").textContent = step.note || "";
+
+    var resultBlock = $("resultBlock");
     var optionGrid = $("optionGrid");
     optionGrid.innerHTML = "";
 
     if (step.result) {
-      $("resultTitle").textContent = step.result.title || "Result";
+      resultBlock.style.display = "block";
+      $("resultTitle").textContent = step.result.title || "Summary";
       renderResultTags(step.result);
-      addOptionButton(optionGrid, "Restart symptom", "primary", function () {
+
+      addOptionButton(optionGrid, "Restart this symptom", "primary", function () {
         startSymptom(currentSymptom.id);
       });
+      addOptionButton(optionGrid, "Choose another symptom", "secondary", function () {
+        resetSymptomAndWizard();
+        saveSession({ symptomId: null, stepId: null, history: [] });
+      });
     } else {
+      resultBlock.style.display = "none";
+      renderResultTags(null);
       (step.options || []).forEach(function (opt) {
-        addOptionButton(optionGrid, opt.label, "secondary", function () {
+        var klass = opt.primary ? "primary" : "secondary";
+        addOptionButton(optionGrid, opt.label, klass, function () {
           goToStep(opt.next);
         });
       });
     }
+
+    $("backStepBtn").disabled = stepHistory.length === 0;
+    $("restartSymptomBtn").disabled = !currentSymptom;
   }
 
   function addOptionButton(container, label, style, onClick) {
     var btn = document.createElement("button");
-    btn.className = "option-btn " + style;
+    btn.type = "button";
+    btn.className = "option-btn " + (style || "");
     btn.textContent = label;
     btn.onclick = onClick;
     container.appendChild(btn);
@@ -293,10 +393,11 @@ const TECHNINJA_DATA_VERSION = "0.4";
     if (!el) return;
     el.innerHTML = "";
 
-    if (result && result.confidence) {
+    if (result && result.confidence && result.confidence.level) {
       var pill = document.createElement("div");
       pill.className = "pill";
-      pill.textContent = "CONFIDENCE: " + result.confidence.toUpperCase();
+      pill.textContent =
+        "CONFIDENCE: " + String(result.confidence.level).toUpperCase();
       el.appendChild(pill);
     }
   }
@@ -313,16 +414,24 @@ const TECHNINJA_DATA_VERSION = "0.4";
       saveSession();
     };
 
+    $("restartSymptomBtn").onclick = function () {
+      if (!currentSymptom) return;
+      startSymptom(currentSymptom.id);
+    };
+
     loadMachines();
 
     var versionEl = $("techninja-version");
     if (versionEl) {
       versionEl.textContent =
-        `TechNinja • Build ${TECHNINJA_BUILD} • Data v${TECHNINJA_DATA_VERSION}`;
+        "TechNinja • Build " + TECHNINJA_BUILD +
+        " • Data v" + TECHNINJA_DATA_VERSION;
     }
 
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js").catch(function () {});
+      try {
+        navigator.serviceWorker.register("service-worker.js").catch(function () {});
+      } catch (e) {}
     }
   }
 
